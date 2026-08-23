@@ -36,6 +36,7 @@ interface OffDayChoice {
 }
 
 const WEEK_LENGTH = 7;
+const WEEKEND_START_INDEX = 5;
 
 function modulo(value: number, divisor: number): number {
   return ((value % divisor) + divisor) % divisor;
@@ -164,7 +165,24 @@ function combinations(values: number[], size: number): number[][] {
   return result;
 }
 
-function candidateOffDaySets(forced: Set<number>, targetSize: number): Set<number>[] {
+function includesWeekend(days: Set<number>): boolean {
+  return [...days].some((day) => day >= WEEKEND_START_INDEX);
+}
+
+function requiresWeekendRest(preference: RestPreference): boolean {
+  return preference !== "WEEKDAY";
+}
+
+function targetOffDayCount(employee: SchedulingEmployee, forced: Set<number>): number {
+  const weekendDayNeeded = requiresWeekendRest(employee.restPreference) && !includesWeekend(forced);
+  return Math.max(2, forced.size + (weekendDayNeeded ? 1 : 0));
+}
+
+function candidateOffDaySets(
+  forced: Set<number>,
+  targetSize: number,
+  weekendRequired: boolean,
+): Set<number>[] {
   if (forced.size > targetSize) {
     return [];
   }
@@ -172,9 +190,9 @@ function candidateOffDaySets(forced: Set<number>, targetSize: number): Set<numbe
   const available = Array.from({ length: WEEK_LENGTH }, (_, index) => index).filter(
     (day) => !forced.has(day),
   );
-  return combinations(available, targetSize - forced.size).map(
-    (extraDays) => new Set([...forced, ...extraDays]),
-  );
+  return combinations(available, targetSize - forced.size)
+    .map((extraDays) => new Set([...forced, ...extraDays]))
+    .filter((days) => !weekendRequired || includesWeekend(days));
 }
 
 function adjacentPairs(days: number[]): number {
@@ -236,16 +254,26 @@ function chooseOffDaysForTeam(
     );
   }
 
-  const firstTargetSize = Math.max(2, firstForced.size);
-  const secondTargetSize = Math.max(2, secondForced.size);
+  const firstWeekendRequired = requiresWeekendRest(firstEmployee.restPreference);
+  const secondWeekendRequired = requiresWeekendRest(secondEmployee.restPreference);
+  const firstTargetSize = targetOffDayCount(firstEmployee, firstForced);
+  const secondTargetSize = targetOffDayCount(secondEmployee, secondForced);
   if (firstTargetSize + secondTargetSize > WEEK_LENGTH) {
     throw new ScheduleGenerationError(
       `${firstEmployee.name}和${secondEmployee.name}本周休假过多，无法保证每天至少一人值班`,
     );
   }
 
-  const firstCandidates = candidateOffDaySets(firstForced, firstTargetSize);
-  const secondCandidates = candidateOffDaySets(secondForced, secondTargetSize);
+  const firstCandidates = candidateOffDaySets(
+    firstForced,
+    firstTargetSize,
+    firstWeekendRequired,
+  );
+  const secondCandidates = candidateOffDaySets(
+    secondForced,
+    secondTargetSize,
+    secondWeekendRequired,
+  );
   let best: { choice: OffDayChoice; score: number } | null = null;
 
   for (const first of firstCandidates) {

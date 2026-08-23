@@ -187,7 +187,7 @@ export function RequestCenter({
 
           <article className="content-card preference-card">
             <div className="section-heading"><div><span className="eyebrow">个性化排班</span><h2>我的休息偏好</h2></div><Icon name="sparkles" /></div>
-            <p>现场覆盖和每周休息两天是硬规则；系统会在此基础上尽量满足你的偏好。</p>
+            <p>现场覆盖和每周休息两天是硬规则；除“优先工作日休”外，每周至少安排 1 天周末休息。</p>
             <form onSubmit={savePreference}>
               <div className="preference-options">
                 {Object.entries(preferenceLabels).map(([value, label]) => (

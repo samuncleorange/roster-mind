@@ -54,7 +54,7 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
         <div className="section-heading"><div><span className="eyebrow">安全硬规则</span><h2>固定班次时间</h2></div><Icon name="shield" /></div>
         <div className="fixed-rule"><span className="shift-label day"><Icon name="sun" />白班</span><strong>{settings.dayStart}–{settings.dayEnd}</strong></div>
         <div className="fixed-rule"><span className="shift-label night"><Icon name="moon" />夜班</span><strong>{settings.nightStart}–次日 {settings.nightEnd}</strong></div>
-        <ul><li>每人正常每周工作 5 天、休息 2 天</li><li>同组两人的休息日不重叠</li><li>任何一天白班、夜班至少各有 1 人</li><li>夜班结束后不能立即衔接白班</li></ul>
+        <ul><li>每人正常每周工作 5 天、休息 2 天</li><li>除明确优先工作日休外，每人至少休 1 天周末</li><li>同组两人的休息日不重叠</li><li>任何一天白班、夜班至少各有 1 人</li><li>夜班结束后不能立即衔接白班</li></ul>
       </section>
       <div className="settings-submit"><span className={error ? "inline-error" : "inline-success"}>{error || message}</span><button className="primary-button" disabled={saving}><Icon name="check" />{saving ? "正在保存…" : "保存全部设置"}</button></div>
     </form>

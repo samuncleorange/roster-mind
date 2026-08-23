@@ -74,6 +74,69 @@ test("四人排班满足每人五天、每班每天至少一人", () => {
   }
 });
 
+test("无周末或工作日偏好时每人至少休一天周末，周末每班各一人在岗", () => {
+  const neutralEmployees = employees.map((employee) => ({
+    ...employee,
+    restPreference: "NONE" as const,
+  }));
+  const result = generateFourPersonSchedule({
+    employees: neutralEmployees,
+    config: baseConfig,
+  });
+  const weekendDates = [addDays(baseConfig.weekStart, 5), addDays(baseConfig.weekStart, 6)];
+
+  for (const employee of neutralEmployees) {
+    const workedWeekendDates = new Set(
+      assignmentsFor(result.assignments, employee.id)
+        .filter((assignment) => weekendDates.includes(assignment.date))
+        .map((assignment) => assignment.date),
+    );
+    assert.ok(weekendDates.some((date) => !workedWeekendDates.has(date)));
+  }
+
+  for (const date of weekendDates) {
+    for (const shiftType of ["DAY", "NIGHT"] as const) {
+      const workerCount = result.assignments.filter(
+        (assignment) => assignment.date === date && assignment.shiftType === shiftType,
+      ).length;
+      assert.equal(workerCount, 1);
+    }
+  }
+});
+
+test("同组两人都明确优先工作日休时允许周末共同值班", () => {
+  const weekdayEmployees = employees.map((employee, index) => ({
+    ...employee,
+    restPreference: index < 2 ? "WEEKDAY" as const : employee.restPreference,
+  }));
+  const result = generateFourPersonSchedule({
+    employees: weekdayEmployees,
+    config: baseConfig,
+  });
+
+  for (const date of [addDays(baseConfig.weekStart, 5), addDays(baseConfig.weekStart, 6)]) {
+    const dayWorkers = result.assignments.filter(
+      (assignment) => assignment.date === date && assignment.shiftType === "DAY",
+    );
+    assert.equal(dayWorkers.length, 2);
+  }
+});
+
+test("工作日请假已占满两天时仍为默认偏好保留周末休息", () => {
+  const result = generateFourPersonSchedule({
+    employees,
+    config: baseConfig,
+    approvedLeaves: [
+      { employeeId: "a", startDate: "2026-08-24", endDate: "2026-08-25" },
+    ],
+  });
+  const employeeAssignments = assignmentsFor(result.assignments, "a");
+  const weekendDates = [addDays(baseConfig.weekStart, 5), addDays(baseConfig.weekStart, 6)];
+
+  assert.equal(employeeAssignments.length, 4);
+  assert.ok(weekendDates.some((date) => !employeeAssignments.some((item) => item.date === date)));
+});
+
 test("特殊员工固定白班，其他三人按周期轮换白班搭档", () => {
   const first = determineShiftTeams(employees, baseConfig);
   const second = determineShiftTeams(employees, {
@@ -180,13 +243,17 @@ test("全员可倒班的周期切换周保持覆盖并避免周日夜班直转�
   assert.ok(transitionWeek.metrics.every((metric) => metric.workDays === 5));
 });
 
-test("特殊白班模式可连续生成全年 52 周且每周覆盖完整", () => {
+test("特殊白班模式在默认偏好下可连续生成全年 52 周且周末单人覆盖", () => {
+  const neutralEmployees = employees.map((employee) => ({
+    ...employee,
+    restPreference: "NONE" as const,
+  }));
   let previousWeekAssignments: ScheduleAssignment[] = [];
 
   for (let weekIndex = 0; weekIndex < 52; weekIndex += 1) {
     const weekStart = addDays(baseConfig.weekStart, weekIndex * 7);
     const result = generateFourPersonSchedule({
-      employees,
+      employees: neutralEmployees,
       config: { ...baseConfig, weekStart },
       previousWeekAssignments,
     });
@@ -199,7 +266,11 @@ test("特殊白班模式可连续生成全年 52 周且每周覆盖完整", () =
         const workerCount = result.assignments.filter(
           (assignment) => assignment.date === date && assignment.shiftType === shiftType,
         ).length;
-        assert.ok(workerCount >= 1 && workerCount <= 2);
+        if (dayIndex >= 5) {
+          assert.equal(workerCount, 1);
+        } else {
+          assert.ok(workerCount >= 1 && workerCount <= 2);
+        }
       }
     }
 

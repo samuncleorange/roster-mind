@@ -66,7 +66,7 @@ function EmployeeCard({ employee }: { employee: UserRecord }) {
         <div className="form-field"><label>轮换顺序</label><input name="rotationOrder" type="number" min="0" defaultValue={employee.rotationOrder} required /></div>
       </div>
       <div className="form-field"><label>班次限制</label><select name="shiftRestriction" defaultValue={employee.shiftRestriction}>{Object.entries(restrictionLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
-      <div className="form-field"><label>休息偏好</label><select name="restPreference" defaultValue={employee.restPreference}>{Object.entries(preferenceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
+      <div className="form-field"><label>休息偏好</label><select name="restPreference" defaultValue={employee.restPreference}>{Object.entries(preferenceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><small className="field-help">除“优先工作日休”外，每周至少安排 1 天周末休息。</small></div>
       <div className="form-field"><label>重置密码（可选）</label><input name="password" type="password" minLength={8} placeholder="留空则不修改" /></div>
       <footer>
         <span className={error ? "inline-error" : "inline-success"}>{error || message}</span>
@@ -119,7 +119,7 @@ export function EmployeeManager({ employees }: { employees: UserRecord[] }) {
             <div className="form-field"><label>用户名</label><input name="username" placeholder="例如 zhangsan" required /></div>
             <div className="form-field"><label>初始密码</label><input name="password" type="password" minLength={8} placeholder="至少 8 个字符" required /></div>
             <div className="form-field"><label>班次限制</label><select name="shiftRestriction" defaultValue="ANY">{Object.entries(restrictionLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
-            <div className="form-field"><label>休息偏好</label><select name="restPreference" defaultValue="NONE">{Object.entries(preferenceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
+            <div className="form-field"><label>休息偏好</label><select name="restPreference" defaultValue="NONE">{Object.entries(preferenceLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><small className="field-help">默认至少休 1 天周末；明确选择工作日休时除外。</small></div>
           </div>
           <div className="form-footer"><span className={error ? "inline-error" : "inline-success"}>{error || message}</span><button className="primary-button" disabled={creating}><Icon name="plus" />{creating ? "正在创建…" : "创建员工"}</button></div>
         </form>
