@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: roster_mind
+      POSTGRES_USER: roster_mind
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-roster_mind}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U roster_mind -d roster_mind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - roster_mind_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://roster_mind:roster_mind@db:5432/roster_mind}
+      DATABASE_POOL_MAX: 10
+      SESSION_COOKIE_SECURE: "false"
+      ADMIN_INITIAL_USERNAME: admin
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD:-RosterMind@2026}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-Welcome123!}
+    ports:
+      - "3000:3000"
+
+volumes:
+  roster_mind_data:
