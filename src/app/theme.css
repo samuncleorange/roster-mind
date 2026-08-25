@@ -179,6 +179,48 @@ button:disabled { cursor: not-allowed; opacity: .58; }
 .public-time-panel small { margin-bottom: 3px; color: var(--muted); font-size: 11px; }
 .public-time-panel time { font-size: 24px; font-variant-numeric: tabular-nums; font-weight: 760; letter-spacing: -.035em; }
 .public-time-panel > span { color: #918a9c; font-size: 10px; }
+.public-roster-intro {
+  display: flex; min-height: 180px; align-items: center; justify-content: space-between;
+  gap: 40px; padding: 34px 12px 28px;
+}
+.public-roster-intro h1 {
+  margin: 13px 0 8px; font-size: clamp(38px,4.8vw,58px); font-weight: 760;
+  letter-spacing: -.06em; line-height: 1.08;
+}
+.public-roster-intro p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.public-roster-intro .public-time-panel { flex: 0 0 auto; margin-top: 0; }
+.public-week-primary {
+  position: relative; border-color: rgba(220,215,235,.96);
+  box-shadow: 0 22px 65px rgba(67,55,105,.11);
+}
+.public-week-primary::before {
+  position: absolute; top: 0; right: 34px; left: 34px; height: 3px;
+  border-radius: 0 0 999px 999px; background: linear-gradient(90deg,var(--primary),#9a8cf0,var(--mint));
+  content: "";
+}
+.public-duty-banner {
+  position: relative; display: grid; grid-template-columns: minmax(180px,.7fr) minmax(230px,1fr) minmax(220px,.8fr);
+  align-items: center; gap: 24px; overflow: hidden; margin-bottom: 22px; padding: 19px 22px;
+  border-radius: 19px; color: white;
+}
+.public-duty-banner.day { background: linear-gradient(120deg,#7669e4,#9a89ec 62%,#dbaabd); }
+.public-duty-banner.night { background: linear-gradient(120deg,#393261,#554b88 62%,#7369aa); }
+.public-duty-banner::after {
+  position: absolute; top: -70px; right: -35px; width: 190px; height: 190px;
+  border: 35px solid rgba(255,255,255,.07); border-radius: 50%; content: "";
+}
+.public-duty-banner-status, .public-duty-banner-workers, .public-duty-banner-next { position: relative; z-index: 1; }
+.public-duty-banner-status { display: grid; justify-items: start; gap: 8px; }
+.public-duty-banner-status small { font-size: 10px; opacity: .76; }
+.public-duty-banner-workers span, .public-duty-banner-next span { display: block; font-size: 10px; opacity: .72; }
+.public-duty-banner-workers strong { display: block; margin-top: 5px; font-size: 25px; letter-spacing: -.035em; }
+.public-duty-banner-next {
+  padding-left: 24px; border-left: 1px solid rgba(255,255,255,.2);
+}
+.public-duty-banner-next span { display: flex; align-items: center; gap: 7px; }
+.public-duty-banner-next span svg { width: 15px; height: 15px; }
+.public-duty-banner-next strong { display: block; margin-top: 6px; font-size: 14px; }
+.public-week-primary .schedule-table td { min-height: 116px; }
 .public-duty-card {
   position: relative; display: flex; min-height: 420px; flex-direction: column; justify-content: space-between;
   overflow: hidden; padding: 30px; border: 1px solid rgba(255,255,255,.48); border-radius: 32px;
@@ -475,6 +517,7 @@ button:disabled { cursor: not-allowed; opacity: .58; }
 .mobile-nav, .mobile-topbar { display: none; }
 
 @media (max-width: 1180px) {
+  .public-duty-banner { grid-template-columns: minmax(170px,.65fr) minmax(210px,1fr) minmax(190px,.75fr); gap: 18px; }
   .public-hero { grid-template-columns: 1fr; gap: 42px; padding: 54px 30px 62px; }
   .public-hero-copy { max-width: 720px; }
   .public-duty-card { min-height: 390px; }
@@ -486,6 +529,10 @@ button:disabled { cursor: not-allowed; opacity: .58; }
 
 @media (max-width: 900px) {
   .public-nav, .public-main { width: min(100% - 36px,1320px); }
+  .public-roster-intro { min-height: 165px; gap: 24px; }
+  .public-duty-banner { grid-template-columns: 1fr 1fr; }
+  .public-duty-banner-status { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; }
+  .public-duty-banner-next { padding-left: 18px; }
   .public-rule-grid { grid-template-columns: 1fr; gap: 12px; }
   .public-rule-grid article { min-height: 96px; }
   .sidebar { display: none; }
@@ -530,12 +577,20 @@ button:disabled { cursor: not-allowed; opacity: .58; }
   .public-nav-actions { gap: 0; }
   .public-login-button { min-height: 39px; padding: 0 13px; }
   .public-main { width: min(100% - 28px,1320px); }
+  .public-roster-intro { min-height: auto; align-items: stretch; flex-direction: column; gap: 20px; padding: 32px 3px 24px; }
+  .public-roster-intro h1 { margin-top: 11px; font-size: 39px; }
+  .public-roster-intro p { font-size: 12px; }
+  .public-roster-intro .public-time-panel { margin-top: 0; }
   .public-hero { min-height: auto; gap: 30px; padding: 40px 3px 42px; }
   .public-hero-copy h1 { margin: 15px 0 16px; font-size: 43px; }
   .public-hero-copy > p { font-size: 13px; }
   .public-time-panel { width: 100%; min-width: 0; margin-top: 25px; }
   .public-time-panel time { font-size: 22px; }
   .public-time-panel > span { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+  .public-duty-banner { grid-template-columns: 1fr; gap: 15px; padding: 17px; border-radius: 16px; }
+  .public-duty-banner-status { grid-column: auto; }
+  .public-duty-banner-workers strong { font-size: 23px; }
+  .public-duty-banner-next { padding: 14px 0 0; border-top: 1px solid rgba(255,255,255,.2); border-left: 0; }
   .public-duty-card { min-height: 360px; padding: 22px; border-radius: 24px; }
   .public-duty-card-top { align-items: flex-start; }
   .public-duty-card-top > strong { max-width: 145px; text-align: right; }

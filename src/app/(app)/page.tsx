@@ -82,42 +82,25 @@ function PublicDashboard({
       </nav>
 
       <div className="public-main">
-        <section className="public-hero">
-          <div className="public-hero-copy">
+        <header className="public-roster-intro">
+          <div>
             <span className="public-kicker"><i />全年连续值守 · 实时排班看板</span>
-            <h1>这一刻，谁在<br /><em>守护现场？</em></h1>
-            <p>无需登录，即可快速确认当前值班人员和本周白夜班安排。</p>
-            <div className="public-time-panel">
-              <div>
-                <small>{formatLongDate(currentDate)}</small>
-                <LiveClock timeZone={settings.timezone} initialIso={new Date().toISOString()} />
-              </div>
-              <span>{settings.timezone}</span>
-            </div>
+            <h1>当前周排班表</h1>
+            <p>无需登录即可查看本周白班、夜班安排和当前在岗人员。</p>
           </div>
+          <div className="public-time-panel">
+            <div>
+              <small>{formatLongDate(currentDate)}</small>
+              <LiveClock timeZone={settings.timezone} initialIso={new Date().toISOString()} />
+            </div>
+            <span>组织时区 · {settings.timezone}</span>
+          </div>
+        </header>
 
-          <article className={`public-duty-card ${currentShiftType === "DAY" ? "day" : "night"}`}>
-            <div className="public-duty-card-top">
-              <span className="status-dot">当前值班中</span>
-              <strong>{currentShiftType === "DAY" ? `${settings.dayStart}–${settings.dayEnd}` : `${settings.nightStart}–次日 ${settings.nightEnd}`}</strong>
-            </div>
-            <div className="public-duty-symbol"><Icon name={currentShiftType === "DAY" ? "sun" : "moon"} /></div>
-            <div className="public-duty-content">
-              <small>{currentShiftType === "DAY" ? "白班在岗人员" : "夜班在岗人员"}</small>
-              <h2>{currentNames || "排班尚未发布"}</h2>
-              <p>{currentWorkers.length > 1 ? "两位同事共同值班，现场保持双人覆盖。" : currentWorkers.length === 1 ? "当前由一位同事独立值班，下一班将准时接替。" : "管理员发布本周排班后，这里会自动显示在岗人员。"}</p>
-            </div>
-            <div className="public-next-duty">
-              <span><Icon name="clock" />下一班 · {nextShiftType === "DAY" ? "白班" : "夜班"}</span>
-              <strong>{nextNames || "待安排"}</strong>
-            </div>
-          </article>
-        </section>
-
-        <section className="content-card public-week-section">
+        <section className="content-card public-week-section public-week-primary">
           <div className="public-week-heading">
             <div>
-              <span className="eyebrow">本周公开排班</span>
+              <span className="eyebrow">本周安排</span>
               <h2>{formatWeekRange(currentWeekStart)}</h2>
               <p>白班 {settings.dayStart}–{settings.dayEnd} · 夜班 {settings.nightStart}–次日 {settings.nightEnd}</p>
             </div>
@@ -126,6 +109,22 @@ function PublicDashboard({
               {hasPublishedSchedule ? "已发布" : "等待发布"}
             </span>
           </div>
+
+          <article className={`public-duty-banner ${currentShiftType === "DAY" ? "day" : "night"}`}>
+            <div className="public-duty-banner-status">
+              <span className="status-dot">当前值班中</span>
+              <small>{currentShiftType === "DAY" ? `${settings.dayStart}–${settings.dayEnd}` : `${settings.nightStart}–次日 ${settings.nightEnd}`}</small>
+            </div>
+            <div className="public-duty-banner-workers">
+              <span>{currentShiftType === "DAY" ? "白班在岗" : "夜班在岗"}</span>
+              <strong>{currentNames || "排班尚未发布"}</strong>
+            </div>
+            <div className="public-duty-banner-next">
+              <span><Icon name="clock" />下一班 · {nextShiftType === "DAY" ? "白班" : "夜班"}</span>
+              <strong>{nextNames || "待安排"}</strong>
+            </div>
+          </article>
+
           {!hasPublishedSchedule ? (
             <div className="public-schedule-notice">
               <Icon name="calendar" />
