@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Icon } from "@/components/icons";
@@ -29,9 +30,10 @@ export default async function LoginPage() {
           <div>
             <span className="brand-title">RosterMind</span>
             <h2>欢迎回来</h2>
-            <p>登录后查看本周排班和当前值班人员。</p>
+            <p>登录后申请请假、协商换班或管理团队排班。</p>
           </div>
           <LoginForm />
+          <Link href="/" className="login-public-link"><Icon name="arrowLeft" />返回公开值班看板</Link>
           <small className="login-note"><Icon name="shield" /> 账户由管理员统一创建和管理</small>
         </div>
       </section>
